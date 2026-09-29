@@ -17,7 +17,7 @@ All notable changes to this project are documented here. The format follows
 
 ### Changed
 
-- npm package renamed to `skill-vet` (the name `vetted` is taken on npm).
+- npm package renamed to `@menadirali/skill-vet` (the name `vetted` is taken on npm, and `skill-vet` is too close to an existing package). The command is still `skill-vet`.
 
 ## [0.1.0] - 2026-09-29
 

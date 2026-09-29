@@ -20,9 +20,9 @@ Usage
   skill-vet rules                           List all rules
 
 Examples
-  npx skill-vet vet ./skills
-  npx skill-vet vet anthropics/skills        # vet a repo before installing it
-  npx skill-vet vet --installed              # what are my skills costing me?
+  npx @menadirali/skill-vet vet ./skills
+  npx @menadirali/skill-vet vet anthropics/skills        # vet a repo before installing it
+  npx @menadirali/skill-vet vet --installed              # what are my skills costing me?
 
 Options
   --format <text|json|markdown|github>  Output format (default: text)
