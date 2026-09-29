@@ -1,6 +1,6 @@
 // Output formats for `vetted vet`: text (terminal), json, markdown, github.
 
-import { relative, sep } from "node:path";
+import { relative, sep, join } from "node:path";
 import { homedir } from "node:os";
 
 const useColor = () => process.stdout.isTTY && !process.env.NO_COLOR && process.env.TERM !== "dumb";
@@ -32,9 +32,24 @@ export function summarize(results) {
   };
 }
 
-export function formatText(results, { base = process.cwd(), verbose = false, heading } = {}) {
+export function formatText(results, { base = process.cwd(), verbose = false, heading, quiet = false } = {}) {
   const out = [];
   const s = summarize(results);
+
+  if (quiet) {
+    for (const r of results) {
+      const shown = r.findings.filter((f) => verbose || f.severity !== "info");
+      for (const f of shown) {
+        const sev = f.severity === "error" ? red("error") : f.severity === "warn" ? yellow("warn ") : dim("info ");
+        const file = rel(join(r.dir, f.file), base);
+        const where = dim(`${file}${f.line ? ":" + f.line : ""}`);
+        out.push(`${sev} ${cyan(f.rule)}  ${where}`);
+        out.push(`      ${f.message}`);
+      }
+    }
+    return out.join("\n");
+  }
+
   out.push(bold("vetted") + dim(` · ${heading ?? `scanned ${s.skills} skill${s.skills === 1 ? "" : "s"}`}`));
   out.push("");
   const width = Math.min(28, Math.max(8, ...results.map((r) => r.name.length)));
@@ -115,7 +130,7 @@ export function formatMarkdown(results, { base = process.cwd() } = {}) {
 
 // GitHub Actions workflow commands, so findings show up as annotations on the
 // changed files in a pull request.
-export function formatGithub(results, { base = process.cwd() } = {}) {
+export function formatGithub(results, { base = process.cwd(), quiet = false } = {}) {
   const esc = (s) => String(s).replace(/%/g, "%25").replace(/\r/g, "%0D").replace(/\n/g, "%0A");
   const escProp = (s) => esc(s).replace(/:/g, "%3A").replace(/,/g, "%2C");
   const out = [];
@@ -127,7 +142,9 @@ export function formatGithub(results, { base = process.cwd() } = {}) {
       out.push(`::${level} file=${escProp(file)}${f.line ? `,line=${f.line}` : ""},title=${escProp(f.rule)}::${esc(f.message)}`);
     }
   }
-  const s = summarize(results);
-  out.push(`vetted: ${s.skills} skills, ${s.errors} errors, ${s.warnings} warnings`);
+  if (!quiet) {
+    const s = summarize(results);
+    out.push(`vetted: ${s.skills} skills, ${s.errors} errors, ${s.warnings} warnings`);
+  }
   return out.join("\n");
 }
