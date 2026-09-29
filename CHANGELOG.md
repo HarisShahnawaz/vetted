@@ -6,6 +6,8 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-09-29
+
 ### Added
 
 - `vet` rule `sec/suspicious-install` (warn): flags `npm install`, `pip install`, and `cargo add`
@@ -18,6 +20,13 @@ All notable changes to this project are documented here. The format follows
 ### Changed
 
 - npm package renamed to `@menadirali/skill-vet` (the name `vetted` is taken on npm, and `skill-vet` is too close to an existing package). The command is still `skill-vet`.
+
+### Fixed
+
+- `sec/suspicious-install` no longer reads past the closing backtick of inline code, which flagged
+  `pytest` as a typosquat of itself in lists like `` `npm test`, `pytest` ``.
+- Fenced code blocks indented under a list item are now treated as code, so example links inside
+  them no longer raise `spec/broken-reference`.
 
 ## [0.1.0] - 2026-09-29
 
