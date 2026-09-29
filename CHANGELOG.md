@@ -10,6 +10,8 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- `vet` flag `--quiet` (`-q`): prints only findings, with no summary line or cost
+  table, for cleaner use in scripts and CI logs.
 - `vet` rule `sec/suspicious-install` (warn): flags `npm install`, `pip install`, and `cargo add`
   commands that name a package within edit distance 1–2 of a popular package (`requests`,
   `lodash`, `react`, etc.) but aren't that package. Uses no network and no new dependencies.
