@@ -1,0 +1,38 @@
+{
+  "name": "vetted",
+  "version": "0.1.0",
+  "description": "Agent skills that prove they work, and a zero-dependency scanner that vets any skill before you install it.",
+  "type": "module",
+  "bin": {
+    "vetted": "cli/vet.mjs"
+  },
+  "files": [
+    "cli/vet.mjs",
+    "cli/lib/"
+  ],
+  "scripts": {
+    "test": "node --test",
+    "vet": "node cli/vet.mjs vet skills --strict",
+    "evals": "claude plugin eval . --trust-plugin --scaffold --allow-tools Write Edit --no-publish"
+  },
+  "engines": {
+    "node": ">=18.17"
+  },
+  "keywords": [
+    "agent-skills",
+    "skills",
+    "claude-code",
+    "codex",
+    "cursor",
+    "security",
+    "lint",
+    "evals"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nadirali1350/vetted.git"
+  },
+  "homepage": "https://github.com/nadirali1350/vetted#readme",
+  "bugs": "https://github.com/nadirali1350/vetted/issues",
+  "license": "MIT"
+}

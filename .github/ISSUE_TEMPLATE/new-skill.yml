@@ -1,0 +1,22 @@
+name: Propose a skill
+description: An idea for a new skill. It gets merged once it shows a positive delta in evals.
+labels: ["new skill"]
+body:
+  - type: textarea
+    id: failure
+    attributes:
+      label: What goes wrong without it
+      description: A behavior current models get wrong, with an example prompt.
+    validations:
+      required: true
+  - type: textarea
+    id: behavior
+    attributes:
+      label: What the skill would make the agent do instead
+    validations:
+      required: true
+  - type: textarea
+    id: measure
+    attributes:
+      label: How an eval could tell the difference
+      description: What a grader would check in the output or the files.

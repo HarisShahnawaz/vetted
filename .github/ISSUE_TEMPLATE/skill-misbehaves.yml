@@ -1,0 +1,37 @@
+name: A skill misbehaves
+description: A skill fired when it shouldn't, didn't fire when it should, or made the result worse.
+labels: ["skill", "needs eval case"]
+body:
+  - type: dropdown
+    id: skill
+    attributes:
+      label: Skill
+      options: [prove-it, surgical, root-cause, bug-hunt-review, stdlib-first, grill, handoff, answer-first, secure-defaults, other]
+    validations:
+      required: true
+  - type: input
+    id: agent
+    attributes:
+      label: Agent and model
+      placeholder: "Claude Code 2.1.283, claude-sonnet-5-5"
+    validations:
+      required: true
+  - type: textarea
+    id: prompt
+    attributes:
+      label: What you asked
+      description: The prompt, and any files the task needed.
+    validations:
+      required: true
+  - type: textarea
+    id: happened
+    attributes:
+      label: What happened, and what you expected
+    validations:
+      required: true
+  - type: checkboxes
+    id: eval
+    attributes:
+      label: Eval case
+      options:
+        - label: I'd like to turn this into an eval case (a maintainer can help)

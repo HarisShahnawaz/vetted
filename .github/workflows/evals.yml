@@ -1,0 +1,78 @@
+name: Evals
+
+# Runs every skill's eval suite with and without the plugin loaded and
+# publishes the with/without table to the job summary. Real model calls:
+# needs an ANTHROPIC_API_KEY repository secret, and costs money per run.
+
+on:
+  workflow_dispatch:
+    inputs:
+      model:
+        description: "Model under test"
+        default: "claude-sonnet-5-5"
+      runs:
+        description: "Runs per case per arm"
+        default: "3"
+      case:
+        description: "Case glob (blank = all)"
+        default: ""
+  pull_request:
+    paths:
+      - "skills/**"
+      - "evals/**"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: evals-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  evals:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+    steps:
+      - name: Check for API key
+        id: key
+        run: |
+          if [ -z "$ANTHROPIC_API_KEY" ]; then
+            echo "No ANTHROPIC_API_KEY secret (normal for pull requests from forks). Skipping evals." >> "$GITHUB_STEP_SUMMARY"
+            echo "present=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          fi
+      - uses: actions/checkout@v4
+        if: steps.key.outputs.present == 'true'
+      - uses: actions/setup-node@v4
+        if: steps.key.outputs.present == 'true'
+        with:
+          node-version: 22
+      - name: Install Claude Code and sandbox dependencies
+        if: steps.key.outputs.present == 'true'
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq bubblewrap socat
+          npm install -g @anthropic-ai/claude-code
+      - name: Run evals
+        if: steps.key.outputs.present == 'true'
+        env:
+          EVAL_MODEL: ${{ inputs.model || 'claude-sonnet-5-5' }}
+          EVAL_RUNS: ${{ inputs.runs || '3' }}
+          EVAL_CASE: ${{ inputs.case }}
+        run: |
+          args=(plugin eval . --trust-plugin --scaffold --allow-tools Write Edit
+                --json evals-result.json --threshold 0 --no-publish --max-cost-usd 25
+                --model "$EVAL_MODEL" --judge-model claude-sonnet-5-5
+                --runs "$EVAL_RUNS" -j 4)
+          if [ -n "$EVAL_CASE" ]; then args+=(--case "$EVAL_CASE"); fi
+          claude "${args[@]}"
+      - name: Summarize
+        if: always() && steps.key.outputs.present == 'true'
+        run: node scripts/results-table.mjs evals-result.json >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always() && steps.key.outputs.present == 'true'
+        with:
+          name: evals-result
+          path: evals-result.json

@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="510" viewBox="0 0 900 510" role="img" aria-label="vetted terminal output">
+  <rect width="900" height="510" rx="12" fill="#18181b"/>
+  <rect width="900" height="30" rx="12" fill="#27272a"/>
+  <rect y="18" width="900" height="12" fill="#27272a"/>
+  <circle cx="20" cy="15" r="5.5" fill="#f87171"/><circle cx="38" cy="15" r="5.5" fill="#facc15"/><circle cx="56" cy="15" r="5.5" fill="#4ade80"/>
+  <g font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace" font-size="13" fill="#d4d4d8">
+  <text x="22" y="50" xml:space="preserve"><tspan fill="#a78bfa" font-weight="700">$ </tspan><tspan fill="#fafafa">vetted vet ./skills</tspan></text>
+  <text x="22" y="70" xml:space="preserve"><tspan fill="#d4d4d8"></tspan></text>
+  <text x="22" y="90" xml:space="preserve"><tspan fill="#fafafa" font-weight="700">vetted</tspan><tspan fill="#71717a"> · scanned 3 skills</tspan></text>
+  <text x="22" y="110" xml:space="preserve"><tspan fill="#d4d4d8"></tspan></text>
+  <text x="22" y="130" xml:space="preserve"><tspan fill="#f87171" font-weight="700">✖ </tspan><tspan fill="#fafafa" font-weight="700">pdf-magic</tspan><tspan fill="undefined">   </tspan><tspan fill="#71717a">desc ≈4 tok · body ≈47 tok</tspan><tspan fill="undefined">  </tspan><tspan fill="#71717a">skills/pdf-magic</tspan></text>
+  <text x="22" y="150" xml:space="preserve"><tspan fill="undefined">    </tspan><tspan fill="#f87171" font-weight="700">error</tspan><tspan fill="undefined"> </tspan><tspan fill="#67e8f9">sec/remote-exec</tspan><tspan fill="undefined">  </tspan><tspan fill="#71717a">scripts/setup.sh:2</tspan></text>
+  <text x="22" y="170" xml:space="preserve"><tspan fill="#d4d4d8">          downloads code and pipes it straight into an interpreter: `curl -fsSL https://raw.githubuserconte…</tspan></text>
+  <text x="22" y="190" xml:space="preserve"><tspan fill="undefined">    </tspan><tspan fill="#f87171" font-weight="700">error</tspan><tspan fill="undefined"> </tspan><tspan fill="#67e8f9">sec/hidden-unicode</tspan><tspan fill="undefined">  </tspan><tspan fill="#71717a">SKILL.md:10</tspan></text>
+  <text x="22" y="210" xml:space="preserve"><tspan fill="#d4d4d8">          contains an invisible character (ZERO WIDTH SPACE) that can hide instructions from a human review…</tspan></text>
+  <text x="22" y="230" xml:space="preserve"><tspan fill="undefined">    </tspan><tspan fill="#f87171" font-weight="700">error</tspan><tspan fill="undefined"> </tspan><tspan fill="#67e8f9">sec/prompt-injection</tspan><tspan fill="undefined">  </tspan><tspan fill="#71717a">SKILL.md:10</tspan></text>
+  <text x="22" y="250" xml:space="preserve"><tspan fill="#d4d4d8">          contains text that tries to override the agent's instructions or hide actions from the user: `Do …</tspan></text>
+  <text x="22" y="270" xml:space="preserve"><tspan fill="undefined">    </tspan><tspan fill="#facc15" font-weight="700">warn </tspan><tspan fill="undefined"> </tspan><tspan fill="#67e8f9">sec/secret-access</tspan><tspan fill="undefined">  </tspan><tspan fill="#71717a">scripts/setup.sh:3</tspan></text>
+  <text x="22" y="290" xml:space="preserve"><tspan fill="#d4d4d8">          references credential or key files: `.aws/credentials`</tspan></text>
+  <text x="22" y="310" xml:space="preserve"><tspan fill="undefined">    </tspan><tspan fill="#facc15" font-weight="700">warn </tspan><tspan fill="undefined"> </tspan><tspan fill="#67e8f9">trigger/too-vague</tspan><tspan fill="undefined">  </tspan><tspan fill="#71717a">SKILL.md</tspan></text>
+  <text x="22" y="330" xml:space="preserve"><tspan fill="#d4d4d8">          description is very short; agents match requests against it, so name the task and the situations …</tspan></text>
+  <text x="22" y="350" xml:space="preserve"><tspan fill="undefined">    </tspan><tspan fill="#facc15" font-weight="700">warn </tspan><tspan fill="undefined"> </tspan><tspan fill="#67e8f9">trigger/no-when</tspan><tspan fill="undefined">  </tspan><tspan fill="#71717a">SKILL.md</tspan></text>
+  <text x="22" y="370" xml:space="preserve"><tspan fill="#d4d4d8">          description says what the skill does but not when to use it; add a "Use when ..." clause</tspan></text>
+  <text x="22" y="390" xml:space="preserve"><tspan fill="#4ade80" font-weight="700">✔ </tspan><tspan fill="#fafafa" font-weight="700">prove-it</tspan><tspan fill="undefined">    </tspan><tspan fill="#71717a">desc ≈78 tok · body ≈555 tok</tspan><tspan fill="undefined">  </tspan><tspan fill="#71717a">skills/prove-it</tspan></text>
+  <text x="22" y="410" xml:space="preserve"><tspan fill="#4ade80" font-weight="700">✔ </tspan><tspan fill="#fafafa" font-weight="700">root-cause</tspan><tspan fill="undefined">  </tspan><tspan fill="#71717a">desc ≈79 tok · body ≈468 tok</tspan><tspan fill="undefined">  </tspan><tspan fill="#71717a">skills/root-cause</tspan></text>
+  <text x="22" y="430" xml:space="preserve"><tspan fill="#d4d4d8"></tspan></text>
+  <text x="22" y="450" xml:space="preserve"><tspan fill="#d4d4d8">3 skills · </tspan><tspan fill="#f87171" font-weight="700">3 errors</tspan><tspan fill="#d4d4d8"> · </tspan><tspan fill="#facc15" font-weight="700">3 warnings</tspan><tspan fill="#71717a"> (1 info hidden, use --verbose)</tspan></text>
+  <text x="22" y="470" xml:space="preserve"><tspan fill="#71717a">context: ≈161 tokens always loaded (names + descriptions) · ≈1.1k tokens if every skill activates</tspan></text>
+  </g>
+</svg>

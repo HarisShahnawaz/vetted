@@ -1,0 +1,13 @@
+{
+  "name": "vetted",
+  "version": "0.1.0",
+  "description": "Agent skills that prove they work: every skill ships with a with/without eval suite and a measured delta against a no-skill baseline.",
+  "author": {
+    "name": "nadirali1350",
+    "url": "https://github.com/nadirali1350"
+  },
+  "homepage": "https://github.com/nadirali1350/vetted",
+  "repository": "https://github.com/nadirali1350/vetted",
+  "license": "MIT",
+  "keywords": ["skills", "evals", "verification", "code-review", "debugging", "claude-code", "agent-skills"]
+}

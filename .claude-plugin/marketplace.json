@@ -1,0 +1,16 @@
+{
+  "name": "vetted",
+  "description": "Agent skills that prove they work.",
+  "owner": {
+    "name": "nadirali1350",
+    "url": "https://github.com/nadirali1350"
+  },
+  "plugins": [
+    {
+      "name": "vetted",
+      "source": "./",
+      "description": "Skills rebuilt for current models, each with a with/without eval and a measured delta.",
+      "category": "development"
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+name: "vetted: check agent skills"
+description: "Checks SKILL.md files for spec errors, weak triggers, context cost, outdated prompting, and security red flags."
+author: "nadirali1350"
+branding:
+  icon: "shield"
+  color: "green"
+
+inputs:
+  path:
+    description: "Space-separated paths to scan for SKILL.md files."
+    required: false
+    default: "."
+  strict:
+    description: "Fail on warnings as well as errors."
+    required: false
+    default: "false"
+  ignore:
+    description: "Comma-separated rule ids to skip (prefix match with /*, e.g. style/*)."
+    required: false
+    default: ""
+
+runs:
+  using: "composite"
+  steps:
+    - name: Vet skills
+      shell: bash
+      env:
+        VETTED_PATHS: ${{ inputs.path }}
+        VETTED_STRICT: ${{ inputs.strict }}
+        VETTED_IGNORE: ${{ inputs.ignore }}
+      run: |
+        args=(vet)
+        read -r -a paths <<< "$VETTED_PATHS"
+        args+=("${paths[@]}")
+        args+=(--format github --summary-file "$GITHUB_STEP_SUMMARY")
+        if [ "$VETTED_STRICT" = "true" ]; then args+=(--strict); fi
+        if [ -n "$VETTED_IGNORE" ]; then args+=(--ignore "$VETTED_IGNORE"); fi
+        node "$GITHUB_ACTION_PATH/cli/vet.mjs" "${args[@]}"

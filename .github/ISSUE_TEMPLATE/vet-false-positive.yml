@@ -1,0 +1,29 @@
+name: vet false positive or miss
+description: vet flagged something harmless, or missed something it should catch.
+labels: ["vet"]
+body:
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Kind
+      options: [False positive, Missed detection, Crash or wrong output]
+    validations:
+      required: true
+  - type: input
+    id: rule
+    attributes:
+      label: Rule id
+      placeholder: sec/exfil-endpoint
+  - type: textarea
+    id: repro
+    attributes:
+      label: Smallest skill that shows it
+      description: Paste the SKILL.md (and any script) or link to the repo and commit.
+      render: markdown
+    validations:
+      required: true
+  - type: textarea
+    id: output
+    attributes:
+      label: vet output
+      render: text
