@@ -8,6 +8,9 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- `skill-vet rules` now prints a header row (`RULE`, `SEVERITY`, `DESCRIPTION`), and
+  `skill-vet rules --format json` prints the rules as JSON objects with `id`, `severity`, and
+  `description`, for use in tooling.
 - `vet` rule `sec/suspicious-install` (warn): flags `npm install`, `pip install`, and `cargo add`
   commands that name a package within edit distance 1–2 of a popular package (`requests`,
   `lodash`, `react`, etc.) but aren't that package. Uses no network and no new dependencies.

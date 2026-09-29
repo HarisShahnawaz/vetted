@@ -61,6 +61,20 @@ test("rules and version commands", () => {
   assert.match(run("--version").stdout, /^\d+\.\d+\.\d+/);
 });
 
+test("rules shows id, severity and description, as a table or as json", () => {
+  const table = run("rules");
+  assert.equal(table.status, 0, table.stderr);
+  assert.match(table.stdout, /^RULE\s+SEVERITY\s+DESCRIPTION/);
+  assert.match(table.stdout, /^sec\/remote-exec\s+error\s+Downloads code/m);
+
+  const r = run("rules", "--format", "json");
+  assert.equal(r.status, 0, r.stderr);
+  const list = JSON.parse(r.stdout);
+  assert.ok(list.length > 0);
+  assert.ok(list.every((x) => x.id && ["error", "warn", "info"].includes(x.severity) && x.description));
+  assert.deepEqual(list.find((x) => x.id === "sec/remote-exec").severity, "error");
+});
+
 test("an empty directory is not an error", () => {
   const r = run("vet", p("clean/ok-skill/nothing-here"));
   assert.equal(r.status, 0);
