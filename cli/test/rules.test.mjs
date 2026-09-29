@@ -218,3 +218,14 @@ test("sec: suspicious-install flags only the typosquat in a multi-package comman
   assert.match(found[0].message, /lodahs/);
   assert.match(found[0].message, /lodash/);
 });
+
+test("sec: suspicious-install stops at the closing backtick of inline code", () => {
+  // Seen in microsoft/skills: a list of forbidden commands, each in its own backticks.
+  const r = make("inline-list", good(), "\nNever run `npm install`, `npm test`, `pytest`, or `pip install` here.\n");
+  assert.ok(!rules(r).includes("warn:sec/suspicious-install"), "pytest must not be flagged as a typosquat of itself");
+});
+
+test("spec: links inside a fenced block indented under a list item are ignored", () => {
+  const r = make("indented-fence", good(), "\n- End every page with related pages:\n  ```markdown\n  | [Auth](../02-architecture/auth.md) | example |\n  ```\n");
+  assert.ok(!rules(r).some((x) => x.endsWith("spec/broken-reference")), "example links inside an indented fence are not real links");
+});

@@ -62,7 +62,8 @@ const INSTALL_ALLOWLIST = new Set(["preact", "numba", "scapy", "serve", "tslint"
 // Flags whose next token is a value, not a package name.
 const INSTALL_FLAGS_WITH_VALUE = new Set(["-r", "-e", "-c", "--index-url", "--features", "-F"]);
 const INSTALL_CMD_RE = /\b(npm\s+i(?:nstall)?|pip3?\s+install|cargo\s+add)\b/;
-const INSTALL_SHELL_OP_RE = /&&|\|\||[;|#]/;
+// A closing backtick ends an inline-code command, so prose after it is not parsed.
+const INSTALL_SHELL_OP_RE = /&&|\|\||[;|#`]/;
 
 // ---------------------------------------------------------------- security patterns
 
@@ -181,7 +182,7 @@ function lineOf(text, index) {
 // Replaces fenced code blocks and inline code with spaces, keeping offsets.
 function maskCode(text) {
   return text
-    .replace(/(^|\n)(```|~~~)[^\n]*\n[\s\S]*?\n\2[^\n]*(?=\n|$)/g, (m) => m.replace(/[^\n]/g, " "))
+    .replace(/(^|\n)[ \t]*(```|~~~)[^\n]*\n[\s\S]*?\n[ \t]*\2[^\n]*(?=\n|$)/g, (m) => m.replace(/[^\n]/g, " "))
     .replace(/`[^`\n]+`/g, (m) => " ".repeat(m.length));
 }
 
@@ -472,7 +473,7 @@ function parseInstallPackages(line) {
   let skipNext = false;
   for (let tok of rest.trim().split(/\s+/).filter(Boolean)) {
     // Strip surrounding punctuation that isn't part of a package name (backticks, quotes, parens...).
-    tok = tok.replace(/^[`'"(]+/, "").replace(/[`'".;!?)]+$/, "");
+    tok = tok.replace(/^[`'"(]+/, "").replace(/[`'".,;:!?)]+$/, "");
     if (!tok) continue;
     if (skipNext) { skipNext = false; continue; }
     if (INSTALL_FLAGS_WITH_VALUE.has(tok)) { skipNext = true; continue; }
