@@ -6,6 +6,8 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-09-29
+
 ### Added
 
 - `vet` rule `sec/suspicious-install` (warn): flags `npm install`, `pip install`, and `cargo add`
