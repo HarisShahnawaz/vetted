@@ -49,6 +49,21 @@ const BINARY_EXEC_EXT = new Set([".exe", ".dll", ".so", ".dylib", ".bin", ".msi"
 const SKIP_DIRS = new Set([".git", "node_modules", "__pycache__", ".venv", "venv"]);
 const MAX_FILE_BYTES = 1024 * 1024;
 
+// Popular packages used as a reference list for typosquat detection.
+// Keep this list small and curated; no network lookups, no new deps.
+const POPULAR_PACKAGES = new Set([
+  // Python
+  "requests", "numpy", "pandas", "flask", "django", "scipy", "matplotlib", "pytest",
+  // JavaScript / npm
+  "lodash", "express", "react", "axios", "webpack", "eslint", "typescript",
+]);
+// Legitimate packages that happen to be close neighbors of popular ones.
+const INSTALL_ALLOWLIST = new Set(["preact", "numba", "scapy", "serve", "tslint", "request", "pandoc"]);
+// Flags whose next token is a value, not a package name.
+const INSTALL_FLAGS_WITH_VALUE = new Set(["-r", "-e", "-c", "--index-url", "--features", "-F"]);
+const INSTALL_CMD_RE = /\b(npm\s+i(?:nstall)?|pip3?\s+install|cargo\s+add)\b/;
+const INSTALL_SHELL_OP_RE = /&&|\|\||[;|#]/;
+
 // ---------------------------------------------------------------- security patterns
 
 const SEC_PATTERNS = [
@@ -367,6 +382,13 @@ export function vetSkill(skillFile) {
         }
       }
     }
+    // Typosquat-install check: scan every line for suspicious package names.
+    for (let li = 0; li < lines.length; li++) {
+      for (const pkg of parseInstallPackages(lines[li])) {
+        const hit = suspiciousInstallMatch(pkg);
+        if (hit) push("sec/suspicious-install", "warn", `installs \`${pkg}\`, which is 1\u20132 edits from \`${hit}\`; verify it is not a typosquat`, li + 1);
+      }
+    }
     if (isMarkdown) {
       for (const m of content.matchAll(/<!--([\s\S]*?)-->/g)) {
         const inner = m[1].trim();
@@ -437,6 +459,45 @@ function editDistance(a, b) {
     for (let j = 1; j <= b.length; j++)
       dp[i][j] = Math.min(dp[i - 1][j] + 1, dp[i][j - 1] + 1, dp[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
   return dp[a.length][b.length];
+}
+
+/** Extracts package names from one install-command line, stopping at shell operators. */
+function parseInstallPackages(line) {
+  const m = line.match(INSTALL_CMD_RE);
+  if (!m) return [];
+  let rest = line.slice(m.index + m[0].length);
+  const opIdx = rest.search(INSTALL_SHELL_OP_RE);
+  if (opIdx !== -1) rest = rest.slice(0, opIdx);
+  const pkgs = [];
+  let skipNext = false;
+  for (let tok of rest.trim().split(/\s+/).filter(Boolean)) {
+    // Strip surrounding punctuation that isn't part of a package name (backticks, quotes, parens...).
+    tok = tok.replace(/^[`'"(]+/, "").replace(/[`'".;!?)]+$/, "");
+    if (!tok) continue;
+    if (skipNext) { skipNext = false; continue; }
+    if (INSTALL_FLAGS_WITH_VALUE.has(tok)) { skipNext = true; continue; }
+    if (tok.startsWith("-")) continue;
+    // Skip scoped packages (@scope/pkg), paths (contain / or .), and URLs (contain :).
+    if (tok.startsWith("@") || /[\/.]/.test(tok) || tok.includes(":")) continue;
+    // Strip extras ([security]), then version specifiers (@x, ==x, >=x, etc.).
+    const name = tok.replace(/\[.*\]/, "").replace(/[@=<>~!].*$/, "").toLowerCase();
+    if (name.length >= 5) pkgs.push(name);
+  }
+  return pkgs;
+}
+
+/**
+ * Returns the popular package that `pkg` appears to be a typosquat of, or null.
+ * Uses distance-1 for short popular names (<=5 chars) and distance 1-2 for longer ones.
+ */
+function suspiciousInstallMatch(pkg) {
+  if (INSTALL_ALLOWLIST.has(pkg)) return null;
+  for (const popular of POPULAR_PACKAGES) {
+    if (pkg === popular) return null; // exact match — the real package
+    const threshold = popular.length <= 5 ? 1 : 2;
+    if (editDistance(pkg, popular) <= threshold) return popular;
+  }
+  return null;
 }
 
 function maskLinks(text) {

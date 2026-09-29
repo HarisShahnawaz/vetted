@@ -73,6 +73,7 @@ const RULES = [
   ["sec/hidden-instructions", "warn", "Instructions inside HTML comments"],
   ["sec/broad-allowed-tools", "warn", "Pre-approves an unrestricted shell"],
   ["sec/binary", "warn", "Ships compiled executables"],
+  ["sec/suspicious-install", "warn", "Install command names a package within 1-2 edits of a popular one"],
 ];
 
 function parseArgs(argv) {
