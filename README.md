@@ -107,7 +107,7 @@ beside it, and reports:
 
 | Family | What it catches |
 | --- | --- |
-| **`sec/`** | Download-and-execute (`curl … \| sh`, `iex (iwr …)`), decode-and-execute, prompt injection ("ignore previous instructions", "without telling the user"), invisible Unicode and bidi overrides, permission bypass flags, credential-file access, exfiltration endpoints and raw IPs, cloud metadata access, env dumps, shell-profile/cron/hook persistence, unrestricted `allowed-tools`, shipped binaries |
+| **`sec/`** | Download-and-execute (`curl … \| sh`, `iex (iwr …)`), decode-and-execute, prompt injection ("ignore previous instructions", "without telling the user"), invisible Unicode and bidi overrides, permission bypass flags, credential-file access, exfiltration endpoints and raw IPs, cloud metadata access, env dumps, shell-profile/cron/hook persistence, unrestricted `allowed-tools`, shipped binaries, suspicious package names in install commands (typosquat detection) |
 | **`spec/`** | The [Agent Skills spec](https://agentskills.io/specification): name format and directory match, description limits, frontmatter shape, broken links inside the skill, oversized bodies |
 | **`trigger/`** | Descriptions too vague to match against, no "use when" clause, over Claude Code's 1,536-character listing cap, duplicate names, and two skills whose descriptions overlap enough to confuse selection |
 | **`style/`** | Prompting habits that backfire on current models: walls of MUST/NEVER/CRITICAL, all-caps shouting, "You are a world-class expert…" boilerplate |

@@ -6,6 +6,14 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- `vet` rule `sec/suspicious-install` (warn): flags `npm install`, `pip install`, and `cargo add`
+  commands that name a package within edit distance 1–2 of a popular package (`requests`,
+  `lodash`, `react`, etc.) but aren't that package. Uses no network and no new dependencies.
+  Strips flags, version specifiers, and extras before comparing; stops at shell operators;
+  allows known close neighbors (`preact`, `scapy`, `tslint`, …).
+
 ## [0.1.0] - 2026-09-29
 
 ### Added
