@@ -170,3 +170,51 @@ test("cross-skill: overlapping descriptions", () => {
   const b = vetSkill(box.skill("ov/review-b", `name: review-b\ndescription: ${d} Also style.`));
   assert.ok(crossSkillFindings([a, b]).some((x) => x.finding.rule === "trigger/overlap"));
 });
+
+test("sec: suspicious-install flags typosquats in npm and pip commands", () => {
+  // npm typosquat in a script file
+  const npm = make("typo-npm", good(), undefined, {
+    "scripts/setup.sh": "npm install lodahs\n",
+  });
+  assert.ok(rules(npm).includes("warn:sec/suspicious-install"), "lodahs (npm) should flag");
+
+  // pip typosquat in SKILL.md body
+  const pip = make("typo-pip", good(), "\nRun `pip install reqeusts` to get started.\n");
+  assert.ok(rules(pip).includes("warn:sec/suspicious-install"), "reqeusts (pip) should flag");
+});
+
+test("sec: suspicious-install does not flag real package names", () => {
+  const real = make("real-npm", good(), "\nRun `npm install lodash react axios`.\n");
+  assert.ok(!rules(real).includes("warn:sec/suspicious-install"), "real npm packages should not flag");
+
+  const realPip = make("real-pip", good(), "\nInstall with `pip install requests numpy pandas`.\n");
+  assert.ok(!rules(realPip).includes("warn:sec/suspicious-install"), "real pip packages should not flag");
+
+  const unrelated = make("unrelated", good(), "\nRun `npm install mocha` and `pip install pep8`.\n");
+  assert.ok(!rules(unrelated).includes("warn:sec/suspicious-install"), "unrelated packages should not flag");
+});
+
+test("sec: suspicious-install does not flag allowlisted neighbors", () => {
+  // preact (edit-distance 1 from react), scapy (distance 1 from scipy), tslint (distance 1 from eslint)
+  const r = make("allowlist", good(), "\n`pip install scapy numba` and `npm install preact tslint serve`.\n");
+  assert.ok(!rules(r).includes("warn:sec/suspicious-install"), "allowlisted packages should not flag");
+});
+
+test("sec: suspicious-install does not flag real neighbors request and pandoc", () => {
+  const r = make("real-neighbors", good(), "\nRun `npm install request` and `pip install pandoc`.\n");
+  assert.ok(!rules(r).includes("warn:sec/suspicious-install"), "request and pandoc are real packages");
+});
+
+test("sec: suspicious-install stops at shell operators", () => {
+  // 'python' after && is not a package name and requests is the real package
+  const r = make("shell-op", good(), "\nRun `pip install requests && python run.py`.\n");
+  assert.ok(!rules(r).includes("warn:sec/suspicious-install"), "tokens after && should not be parsed");
+});
+
+test("sec: suspicious-install flags only the typosquat in a multi-package command", () => {
+  const r = make("multi-pkg", good(), "\nRun `npm install react lodahs`.\n");
+  const found = r.findings.filter((f) => f.rule === "sec/suspicious-install");
+  assert.equal(found.length, 1, "only lodahs should flag");
+  assert.match(found[0].message, /lodahs/);
+  assert.match(found[0].message, /lodash/);
+});
