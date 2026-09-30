@@ -15,6 +15,9 @@ All notable changes to this project are documented here. The format follows
 - `skill-vet rules` now prints a header row (`RULE`, `SEVERITY`, `DESCRIPTION`), and
   `skill-vet rules --format json` prints the rules as JSON objects with `id`, `severity`, and
   `description`, for use in tooling.
+- `vet` rule `sec/sudo` (warn): flags `sudo` in skill bodies and scripts, since a skill that
+  escalates privileges deserves a second look. Words that only contain it (`pseudo`, `sudoku`,
+  `sudoers`) are not flagged.
 
 ### Removed
 

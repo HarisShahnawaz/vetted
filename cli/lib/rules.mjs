@@ -128,6 +128,12 @@ const SEC_PATTERNS = [
     re: /(?<![-=])>>?\s*~?\/?[\w./$]*\.(bashrc|zshrc|bash_profile|profile|zprofile)\b|\bcrontab\s+(-[^l\s]|\S+\.cron)|\blaunchctl\s+(load|bootstrap)\b|\bschtasks\s+\/create\b|CurrentVersion\\Run\b|\.claude\/settings(\.local)?\.json[^\n]*(>|hooks)/i,
     msg: "installs something that runs automatically outside the task (shell profile, cron, launch agent, hooks)",
   },
+  {
+    rule: "sec/sudo",
+    severity: "warn",
+    re: /\bsudo\b/,
+    msg: "uses sudo, which escalates privileges",
+  },
 ];
 
 const HIDDEN_UNICODE = /[\u200B-\u200F\u202A-\u202E\u2060-\u2064\u2066-\u2069\uFEFF]|\uDB40[\uDC00-\uDC7F]/g;
