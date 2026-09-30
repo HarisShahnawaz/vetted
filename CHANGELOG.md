@@ -6,6 +6,12 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- `skill-vet rules` now prints a header row (`RULE`, `SEVERITY`, `DESCRIPTION`), and
+  `skill-vet rules --format json` prints the rules as JSON objects with `id`, `severity`, and
+  `description`, for use in tooling.
+
 ## [0.1.1] - 2026-09-29
 
 ### Added

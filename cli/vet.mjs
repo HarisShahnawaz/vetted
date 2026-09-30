@@ -18,6 +18,7 @@ Usage
   skill-vet vet [paths or owner/repo ...]   Check skills (default: current directory)
   skill-vet vet --installed                 Check every skill your agents have installed
   skill-vet rules                           List all rules
+  skill-vet rules --format json             List all rules in JSON
 
 Examples
   npx @menadirali/skill-vet vet ./skills
@@ -118,7 +119,13 @@ function main(argv) {
   if (opts.version) return console.log(VERSION), 0;
   if (opts.help || cmd === "help") return console.log(HELP), 0;
   if (cmd === "rules") {
-    for (const [id, sev, desc] of RULES) console.log(`${id.padEnd(28)} ${sev.padEnd(6)} ${desc}`);
+    if (opts.format === "json") {
+      const list = RULES.map(([id, sev, desc]) => ({ id, severity: sev, description: desc }));
+      console.log(JSON.stringify(list, null, 2));
+      return 0;
+    }
+    console.log(`${"RULE".padEnd(28)} ${"SEVERITY".padEnd(10)} DESCRIPTION`);
+    for (const [id, sev, desc] of RULES) console.log(`${id.padEnd(28)} ${sev.padEnd(10)} ${desc}`);
     return 0;
   }
   if (cmd !== "vet") throw usage(`unknown command ${cmd}`);
