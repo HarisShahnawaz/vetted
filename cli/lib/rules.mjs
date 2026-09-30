@@ -1,4 +1,4 @@
-// The checks `vetted vet` runs against each skill.
+// The checks `skill-vet vet` runs against each skill.
 //
 // Every finding has a stable rule id (used for suppression and docs), a
 // severity (error | warn | info), a message, and where possible a file and

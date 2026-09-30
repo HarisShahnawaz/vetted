@@ -30,7 +30,7 @@ Options
   --strict                  Exit 1 on warnings as well as errors
   --ignore <rule,...>       Skip rules (prefix match with /*, e.g. style/*)
   --verbose                 Show info-level findings
-  --quiet                   Print only findings, no summary line or cost table
+  -q, --quiet               Print only findings, no summary line or cost table
   --summary-file <path>     Also append a markdown report (e.g. $GITHUB_STEP_SUMMARY)
   -h, --help                Show help
   -v, --version             Show version

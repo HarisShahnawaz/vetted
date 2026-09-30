@@ -1,4 +1,4 @@
-// Output formats for `vetted vet`: text (terminal), json, markdown, github.
+// Output formats for `skill-vet vet`: text (terminal), json, markdown, github.
 
 import { relative, sep, join } from "node:path";
 import { homedir } from "node:os";
