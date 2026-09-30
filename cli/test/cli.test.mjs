@@ -79,3 +79,32 @@ test("an empty directory is not an error", () => {
   const r = run("vet", p("clean/ok-skill/nothing-here"));
   assert.equal(r.status, 0);
 });
+
+test("--quiet prints only findings with no summary or cost table", () => {
+  const clean = run("vet", p("clean"), "--quiet");
+  assert.equal(clean.status, 0);
+  assert.equal(clean.stdout, "");
+
+  const empty = run("vet", p("clean/ok-skill/nothing-here"), "--quiet");
+  assert.equal(empty.status, 0);
+  assert.equal(empty.stdout, "");
+
+  const broken = run("vet", p("broken"), "--quiet");
+  assert.equal(broken.status, 1);
+  assert.match(broken.stdout, /error\s+spec\/name-dir-mismatch/);
+  assert.match(broken.stdout, /bad-skill\/SKILL\.md/);
+  assert.doesNotMatch(broken.stdout, /vetted ·/);
+  assert.doesNotMatch(broken.stdout, /skills ·/);
+  assert.doesNotMatch(broken.stdout, /context:/);
+  assert.doesNotMatch(broken.stdout, /desc ≈/);
+
+  const warny = run("vet", p("warny"), "--quiet");
+  assert.equal(warny.status, 0);
+  assert.match(warny.stdout, /warn\s+trigger\/too-vague/);
+  assert.doesNotMatch(warny.stdout, /skills ·/);
+
+  const warnyStrict = run("vet", p("warny"), "--quiet", "--strict");
+  assert.equal(warnyStrict.status, 1);
+  assert.match(warnyStrict.stdout, /warn\s+trigger\/too-vague/);
+});
+

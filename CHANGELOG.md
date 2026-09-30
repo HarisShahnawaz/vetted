@@ -11,6 +11,13 @@ All notable changes to this project are documented here. The format follows
 - `skill-vet rules` now prints a header row (`RULE`, `SEVERITY`, `DESCRIPTION`), and
   `skill-vet rules --format json` prints the rules as JSON objects with `id`, `severity`, and
   `description`, for use in tooling.
+
+## [0.1.1] - 2026-09-29
+
+### Added
+
+- `vet` flag `--quiet` (`-q`): prints only findings, with no summary line or cost
+  table, for cleaner use in scripts and CI logs.
 - `vet` rule `sec/suspicious-install` (warn): flags `npm install`, `pip install`, and `cargo add`
   commands that name a package within edit distance 1–2 of a popular package (`requests`,
   `lodash`, `react`, etc.) but aren't that package. Uses no network and no new dependencies.
@@ -21,6 +28,13 @@ All notable changes to this project are documented here. The format follows
 ### Changed
 
 - npm package renamed to `@menadirali/skill-vet` (the name `vetted` is taken on npm, and `skill-vet` is too close to an existing package). The command is still `skill-vet`.
+
+### Fixed
+
+- `sec/suspicious-install` no longer reads past the closing backtick of inline code, which flagged
+  `pytest` as a typosquat of itself in lists like `` `npm test`, `pytest` ``.
+- Fenced code blocks indented under a list item are now treated as code, so example links inside
+  them no longer raise `spec/broken-reference`.
 
 ## [0.1.0] - 2026-09-29
 

@@ -30,6 +30,7 @@ Options
   --strict                  Exit 1 on warnings as well as errors
   --ignore <rule,...>       Skip rules (prefix match with /*, e.g. style/*)
   --verbose                 Show info-level findings
+  --quiet                   Print only findings, no summary line or cost table
   --summary-file <path>     Also append a markdown report (e.g. $GITHUB_STEP_SUMMARY)
   -h, --help                Show help
   -v, --version             Show version
@@ -78,7 +79,7 @@ const RULES = [
 ];
 
 function parseArgs(argv) {
-  const opts = { format: "text", strict: false, ignore: [], verbose: false, installed: false, paths: [], summaryFile: null };
+  const opts = { format: "text", strict: false, ignore: [], verbose: false, quiet: false, installed: false, paths: [], summaryFile: null };
   const rest = [...argv];
   const cmd = rest[0] && !rest[0].startsWith("-") ? rest.shift() : "vet";
   while (rest.length) {
@@ -92,6 +93,7 @@ function parseArgs(argv) {
     else if (a === "-v" || a === "--version") opts.version = true;
     else if (a === "--strict") opts.strict = true;
     else if (a === "--verbose") opts.verbose = true;
+    else if (a === "-q" || a === "--quiet") opts.quiet = true;
     else if (a === "--installed") opts.installed = true;
     else if (a === "--json") opts.format = "json";
     else if (a.startsWith("--format")) opts.format = val();
@@ -160,11 +162,14 @@ function main(argv) {
 
     const base = targets.length === 1 && cleanups.length === 1 ? targets[0] : process.cwd();
     if (!results.length && opts.format === "text") {
-      console.log(opts.installed ? "skill-vet · no installed skills found" : "skill-vet · no SKILL.md files found");
+      if (!opts.quiet) {
+        console.log(opts.installed ? "skill-vet · no installed skills found" : "skill-vet · no SKILL.md files found");
+      }
       return 0;
     }
     const render = { text: formatText, json: formatJson, markdown: formatMarkdown, github: formatGithub }[opts.format];
-    console.log(render(results, { base, verbose: opts.verbose, heading }));
+    const out = render(results, { base, verbose: opts.verbose, heading, quiet: opts.quiet });
+    if (out) console.log(out);
     if (opts.summaryFile) appendFileSync(opts.summaryFile, formatMarkdown(results, { base }) + "\n");
 
     const s = summarize(results);

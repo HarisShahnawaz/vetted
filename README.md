@@ -130,6 +130,7 @@ request and as a table in the job summary:
 ```
 
 Other formats: `--format json` (stable schema), `--format markdown`, `--format github`.
+Flags: `--quiet` (print only findings, no summary line or cost table), `--strict` (fail on warnings too), `--verbose` (show info-level findings), `--ignore` (skip rules).
 Exit codes: `0` clean, `1` findings, `2` usage error.
 
 **What it found in the wild.** We ran it on 9 of the most-starred skill repositories (115
