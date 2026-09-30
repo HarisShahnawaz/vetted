@@ -1,77 +1,164 @@
 #!/usr/bin/env node
-// Turns `claude plugin eval --json` output into the per-skill results table.
+// Turns `claude plugin eval --json` output into the README results table.
 //
-//   node scripts/results-table.mjs results.json                 # print markdown
-//   node scripts/results-table.mjs results.json --update-readme # rewrite README section
+//   node scripts/results-table.mjs a.json b.json                  # print markdown
+//   node scripts/results-table.mjs a.json b.json --update-readme  # rewrite README section
+//   node scripts/results-table.mjs a.json --save evals/published  # write compact evidence
 //
-// Several result files can be passed (for example one per model); cases are
-// grouped by the skill directory they live in under evals/.
+// Files are grouped by the model under test. When two files for the same model
+// contain the same case, the later file wins (use this for a corrected re-run).
+// Cases are grouped by the skill directory they live in under evals/.
 
-import { readFileSync, writeFileSync, readdirSync, statSync, existsSync } from "node:fs";
+import { readFileSync, writeFileSync, readdirSync, statSync, existsSync, mkdirSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
-const args = process.argv.slice(2);
-const updateReadme = args.includes("--update-readme");
-const files = args.filter((a) => !a.startsWith("--"));
+const argv = process.argv.slice(2);
+const flag = (name) => {
+  const i = argv.indexOf(name);
+  return i < 0 ? null : argv[i + 1];
+};
+const updateReadme = argv.includes("--update-readme");
+const saveDir = flag("--save");
+const files = argv.filter((a, i) => !a.startsWith("--") && argv[i - 1] !== "--save");
 if (!files.length) {
-  console.error("usage: results-table.mjs <aggregate-result.json>... [--update-readme]");
+  console.error("usage: results-table.mjs <result.json>... [--update-readme] [--save <dir>]");
   process.exit(2);
 }
 
-// case name -> skill, from the evals/<skill>/<case>/ layout
 function caseToSkill() {
   const map = new Map();
-  const evalsDir = join(ROOT, "evals");
-  if (!existsSync(evalsDir)) return map;
+  for (const evalsDir of [join(ROOT, "evals"), join(ROOT, "retired", "evals")]) {
+  if (!existsSync(evalsDir)) continue;
   for (const skill of readdirSync(evalsDir)) {
     const sd = join(evalsDir, skill);
-    if (skill === "results" || skill === "mocks" || !statSync(sd).isDirectory()) continue;
+    if (["results", "mocks", "published"].includes(skill) || !statSync(sd).isDirectory()) continue;
     for (const c of readdirSync(sd)) if (statSync(join(sd, c)).isDirectory()) map.set(c, skill);
+  }
   }
   return map;
 }
-
-const VERDICT = (d) => (d === null ? "–" : d >= 0.1 ? "✅ keeps its place" : d <= -0.05 ? "❌ hurts" : "⚠️ no measurable effect");
-const pct = (x) => (x === null || x === undefined ? "–" : `${Math.round(x * 100)}%`);
-const signed = (x) => (x === null || x === undefined ? "–" : `${x >= 0 ? "+" : ""}${Math.round(x * 100)}`);
-
 const skillOf = caseToSkill();
-const sections = [];
+
+// ---- load and merge
+const byModel = new Map();
 for (const file of files) {
   const r = JSON.parse(readFileSync(file, "utf8"));
-  const model = r.config?.model ?? r.model ?? r.cases?.[0]?.model ?? "default model";
-  const bySkill = new Map();
+  const model = r.suite?.modelOverride ?? "default model";
+  if (!byModel.has(model)) byModel.set(model, { model, judge: r.suite?.judgeModel, costUsd: 0, claudeVersion: r.claudeVersion, date: (r.startedAt ?? "").slice(0, 10), partial: false, cases: new Map(), skipped: new Set() });
+  const m = byModel.get(model);
+  m.costUsd += r.costUsd ?? 0;
+  m.partial ||= !!r.partial;
   for (const c of r.cases ?? []) {
-    const skill = skillOf.get(c.name) ?? "other";
-    if (!bySkill.has(skill)) bySkill.set(skill, []);
-    const withScore = c.aggregates?.score ?? null;
-    const delta = c.aggregates?.delta ?? null;
-    bySkill.get(skill).push({ name: c.name, withScore, withoutScore: delta === null || withScore === null ? null : withScore - delta, delta });
+    // A run that errored (usage limit, timeout) is graded on whatever it
+    // produced, which would publish a fake score. Leave the case out.
+    if ([...(c.arms?.with ?? []), ...(c.arms?.without ?? [])].some((a) => a.error)) {
+      if (!m.cases.has(c.name)) m.skipped.add(c.name);
+      continue;
+    }
+    m.skipped.delete(c.name);
+    const loadedRuns = (c.arms?.with ?? []).map((a) => a.graders?.find((g) => g.name === "skill-fired")).filter(Boolean);
+    const tally = {};
+    for (const arm of ["with", "without"])
+      for (const run of c.arms?.[arm] ?? [])
+        for (const g of run.graders ?? []) {
+          if (g.name === "skill-fired") continue;
+          tally[g.name] ??= { with: [0, 0], without: [0, 0] };
+          tally[g.name][arm][0] += g.passed ? 1 : 0;
+          tally[g.name][arm][1] += 1;
+        }
+    m.cases.set(c.name, {
+      name: c.name,
+      skill: skillOf.get(c.name) ?? "other",
+      runs: c.runsPerCase,
+      with: c.aggregates?.score ?? null,
+      without: c.aggregates?.scoreWithout ?? null,
+      delta: c.aggregates?.delta ?? null,
+      loaded: loadedRuns.length ? `${loadedRuns.filter((g) => g.passed).length}/${loadedRuns.length}` : null,
+      errors: [...(c.arms?.with ?? []), ...(c.arms?.without ?? [])].filter((a) => a.error).length,
+      graders: Object.fromEntries(Object.entries(tally).map(([k, v]) => [k, { with: `${v.with[0]}/${v.with[1]}`, without: `${v.without[0]}/${v.without[1]}` }])),
+    });
   }
+}
+const models = [...byModel.values()];
 
-  const lines = [];
-  lines.push(`**Model under test:** \`${model}\` · **runs per arm:** ${r.config?.runs ?? "3"} · **Claude Code:** ${r.claudeVersion ?? "?"} · **cost:** $${(r.costUsd ?? 0).toFixed(2)}${r.partial ? " · ⚠️ partial run" : ""}`);
-  lines.push("");
-  lines.push("| Skill | Cases | With skill | Without | Δ (points) | Verdict |");
-  lines.push("| --- | ---: | ---: | ---: | ---: | --- |");
-  const detail = [];
-  for (const [skill, cases] of [...bySkill].sort((a, b) => a[0].localeCompare(b[0]))) {
-    const mean = (k) => {
-      const v = cases.map((c) => c[k]).filter((x) => x !== null);
-      return v.length ? v.reduce((a, b) => a + b, 0) / v.length : null;
-    };
-    const d = mean("delta");
-    const name = skill.startsWith("_") ? `_${skill.slice(1)}_ (trigger precision)` : `[\`${skill}\`](skills/${skill}/SKILL.md)`;
-    lines.push(`| ${name} | ${cases.length} | ${pct(mean("withScore"))} | ${pct(mean("withoutScore"))} | ${signed(d)} | ${skill.startsWith("_") ? "–" : VERDICT(d)} |`);
-    for (const c of cases) detail.push(`| ${skill} | \`${c.name}\` | ${pct(c.withScore)} | ${pct(c.withoutScore)} | ${signed(c.delta)} |`);
-  }
-  lines.push("", "<details><summary>Per-case scores</summary>", "", "| Skill | Case | With | Without | Δ |", "| --- | --- | ---: | ---: | ---: |", ...detail, "", "</details>");
-  sections.push(lines.join("\n"));
+// ---- helpers
+const mean = (xs) => {
+  const v = xs.filter((x) => x !== null && x !== undefined);
+  return v.length ? v.reduce((a, b) => a + b, 0) / v.length : null;
+};
+const pct = (x) => (x === null ? "–" : `${Math.round(x * 100)}%`);
+const signed = (x) => (x === null ? "–" : `${x > 0.004 ? "+" : ""}${Math.round(x * 100)}`);
+const short = (m) => m.replace(/^claude-/, "").replace(/-(\d)-(\d)$/, " $1.$2").replace(/^(\w)/, (c) => c.toUpperCase());
+const HELPS = 0.095; // +10 points, allowing for float error
+
+function skillStats(m, skill) {
+  const cs = [...m.cases.values()].filter((c) => c.skill === skill);
+  if (!cs.length) return null;
+  const loaded = cs.map((c) => c.loaded).filter(Boolean);
+  const [a, b] = loaded.reduce(([x, y], s) => [x + +s.split("/")[0], y + +s.split("/")[1]], [0, 0]);
+  return { cases: cs.length, with: mean(cs.map((c) => c.with)), without: mean(cs.map((c) => c.without)), delta: mean(cs.map((c) => c.delta)), loaded: b ? `${a}/${b}` : "–" };
 }
 
-const out = sections.join("\n\n");
+function verdict(stats) {
+  const helped = stats.filter(([, s]) => s && s.delta !== null && s.delta >= HELPS).map(([m]) => short(m));
+  const hurt = stats.filter(([, s]) => s && s.delta !== null && s.delta <= -0.045).map(([m]) => short(m));
+  if (hurt.length && !helped.length) return `❌ hurts on ${hurt.join(", ")}`;
+  if (helped.length === stats.length) return "✅ helps";
+  if (helped.length) return `✅ helps on ${helped.join(", ")}`;
+  return "✂️ no measurable effect";
+}
+
+// ---- render
+const skills = [...new Set(models.flatMap((m) => [...m.cases.values()].map((c) => c.skill)))].sort((a, b) => (a.startsWith("_") ? 1 : b.startsWith("_") ? -1 : a.localeCompare(b)));
+const lines = [];
+lines.push(
+  `| Skill | ${models.map((m) => `${short(m.model)}<br/>with → without (Δ)`).join(" | ")} | Skill loaded | Verdict |`,
+  `| --- | ${models.map(() => "---:").join(" | ")} | ---: | --- |`,
+);
+for (const skill of skills) {
+  const stats = models.map((m) => [m.model, skillStats(m, skill)]);
+  const cells = stats.map(([, s]) => (s ? `${pct(s.with)} → ${pct(s.without)} (**${signed(s.delta)}**)` : "–"));
+  const loaded = stats.map(([, s]) => (s ? s.loaded : "–")).join(" · ");
+  const retired = existsSync(join(ROOT, "retired", "skills", skill));
+  const name = skill.startsWith("_")
+    ? "_no skill should fire_"
+    : retired
+      ? `[\`${skill}\`](retired/skills/${skill}/SKILL.md) _(retired)_`
+      : `[\`${skill}\`](skills/${skill}/SKILL.md)`;
+  lines.push(`| ${name} | ${cells.join(" | ")} | ${skill.startsWith("_") ? "–" : loaded} | ${skill.startsWith("_") ? (stats.every(([, s]) => !s || s.with === 1) ? "✅ nothing fired" : "⚠️ something fired") : verdict(stats)} |`);
+}
+const meta = models
+  .map((m) => `**${short(m.model)}**: ${m.cases.size} cases × ${[...m.cases.values()][0]?.runs ?? 3} runs per arm, judge \`${m.judge}\`, Claude Code ${m.claudeVersion}, ${m.date}, ≈$${m.costUsd.toFixed(2)} at list price${m.partial ? ", ⚠️ partial" : ""}${m.skipped.size ? `. **${m.skipped.size} cases not yet run** (runs errored, e.g. usage limit): ${[...m.skipped].map((n) => "`" + n + "`").join(", ")}` : ""}`)
+  .join("<br/>\n");
+const detailRows = [];
+for (const m of models)
+  for (const c of [...m.cases.values()].sort((a, b) => a.skill.localeCompare(b.skill) || a.name.localeCompare(b.name)))
+    detailRows.push(`| ${short(m.model)} | ${c.skill} | \`${c.name}\` | ${pct(c.with)} | ${pct(c.without)} | ${signed(c.delta)} | ${c.loaded ?? "–"} |`);
+const out = [
+  lines.join("\n"),
+  "",
+  meta,
+  "",
+  "<details><summary>Per-case scores</summary>",
+  "",
+  "| Model | Skill | Case | With | Without | Δ | Loaded |",
+  "| --- | --- | --- | ---: | ---: | ---: | ---: |",
+  ...detailRows,
+  "",
+  "</details>",
+].join("\n");
+
+if (saveDir) {
+  mkdirSync(saveDir, { recursive: true });
+  for (const m of models) {
+    const p = join(saveDir, `${m.date}-${m.model}.json`);
+    writeFileSync(p, JSON.stringify({ model: m.model, judge: m.judge, claudeVersion: m.claudeVersion, date: m.date, costUsd: +m.costUsd.toFixed(2), cases: [...m.cases.values()] }, null, 2) + "\n");
+    console.error(`saved ${p}`);
+  }
+}
+
 if (updateReadme) {
   const readme = join(ROOT, "README.md");
   const text = readFileSync(readme, "utf8");
@@ -81,9 +168,8 @@ if (updateReadme) {
     console.error("README.md has no results markers");
     process.exit(1);
   }
-  const stamp = `_Last run: ${new Date().toISOString().slice(0, 10)}. Regenerate with \`npm run evals\` then \`node scripts/results-table.mjs <result.json> --update-readme\`._`;
-  writeFileSync(readme, text.slice(0, text.indexOf(start) + start.length) + "\n" + out + "\n\n" + stamp + "\n" + text.slice(text.indexOf(end)));
-  console.log("README.md updated");
+  writeFileSync(readme, text.slice(0, text.indexOf(start) + start.length) + "\n" + out + "\n" + text.slice(text.indexOf(end)));
+  console.error("README.md updated");
 } else {
   console.log(out);
 }

@@ -8,20 +8,20 @@ the model on its own.
 | Skill | Cases | What the cases check |
 | --- | --- | --- |
 | `prove-it` | 2 | With no shell, does the final report admit nothing was run, instead of claiming it works or is safe to merge? |
-| `surgical` | 2 | Is the bug fixed or the function added while every unrelated line, and the file's odd conventions, survive byte for byte? |
 | `root-cause` | 2 | Does a bug reported on one page get fixed in the shared helper, and does the reply name the other callers it affected? |
-| `stdlib-first` | 2 | Flag parsing in Node and relative time in Python: built-ins, or a new package? |
 | `bug-hunt-review` | 2 | Two planted bugs found with concrete scenarios; on correct code, no invented bugs. |
 | `grill` | 2 | Questions come a few at a time, each with a recommended answer, and no code gets written. |
 | `handoff` | 1 | Is the verification state accurate ("not re-run since…"), with dead ends and the exact failure kept? |
-| `answer-first` | 2 | Is the answer in the first sentence, with no preamble or sign-off, and a short report after a task? |
-| `secure-defaults` | 2 | Parameterized SQL; no shell strings and no path traversal in a file endpoint. |
 | `_precision` | 2 | Non-coding and conceptual prompts: no workflow skill should fire. |
+
+The suites for the four retired skills (`surgical`, `stdlib-first`, `answer-first`, `secure-defaults`)
+are kept in [`retired/evals/`](../retired/evals/). To re-test one on a new model, copy its skill and
+evals back and run the suite.
 
 ## Running
 
 ```bash
-# everything: 18 cases × 3 runs × 2 arms
+# everything: 11 cases × 3 runs × 2 arms
 npm run evals
 
 # one skill

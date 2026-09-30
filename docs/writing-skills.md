@@ -49,7 +49,7 @@ progressive disclosure is the tool: keep `SKILL.md` to the procedure and put det
 ## 4. Say what not to do, and when not to apply it
 
 Every skill here ends with its limits: `root-cause` says when patching the symptom is right, and
-`answer-first` says what to keep even though it adds length. Without limits, a model applies a
+`bug-hunt-review` says what to report when it finds nothing. Without limits, a model applies a
 skill everywhere, and a skill that fires on everything becomes noise.
 
 ## 5. Measure it
