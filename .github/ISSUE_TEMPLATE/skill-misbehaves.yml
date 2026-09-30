@@ -6,7 +6,7 @@ body:
     id: skill
     attributes:
       label: Skill
-      options: [prove-it, surgical, root-cause, bug-hunt-review, stdlib-first, grill, handoff, answer-first, secure-defaults, other]
+      options: [prove-it, root-cause, bug-hunt-review, grill, handoff, other]
     validations:
       required: true
   - type: input

@@ -1,0 +1,421 @@
+{
+  "model": "claude-sonnet-5-5",
+  "judge": "claude-sonnet-5-5",
+  "claudeVersion": "2.1.284",
+  "date": "2026-09-29",
+  "costUsd": 5.62,
+  "cases": [
+    {
+      "name": "concept-question",
+      "skill": "_precision",
+      "runs": 3,
+      "with": 1,
+      "without": 1,
+      "delta": 0,
+      "loaded": null,
+      "errors": 0,
+      "graders": {
+        "no-workflow-skill": {
+          "with": "3/3",
+          "without": "3/3"
+        }
+      }
+    },
+    {
+      "name": "translate",
+      "skill": "_precision",
+      "runs": 3,
+      "with": 1,
+      "without": 1,
+      "delta": 0,
+      "loaded": null,
+      "errors": 0,
+      "graders": {
+        "no-coding-skill": {
+          "with": "3/3",
+          "without": "3/3"
+        }
+      }
+    },
+    {
+      "name": "fetch-vs-pull",
+      "skill": "answer-first",
+      "runs": 3,
+      "with": 0.6,
+      "without": 0.6,
+      "delta": 0,
+      "loaded": "0/3",
+      "errors": 0,
+      "graders": {
+        "answer-in-first-sentence": {
+          "with": "0/3",
+          "without": "0/3"
+        },
+        "no-preamble": {
+          "with": "3/3",
+          "without": "3/3"
+        },
+        "no-sign-off": {
+          "with": "3/3",
+          "without": "3/3"
+        },
+        "under-200-words": {
+          "with": "3/3",
+          "without": "3/3"
+        }
+      }
+    },
+    {
+      "name": "task-report",
+      "skill": "answer-first",
+      "runs": 3,
+      "with": 1,
+      "without": 1,
+      "delta": 0,
+      "loaded": "0/3",
+      "errors": 0,
+      "graders": {
+        "no-sign-off": {
+          "with": "3/3",
+          "without": "3/3"
+        },
+        "renamed": {
+          "with": "3/3",
+          "without": "3/3"
+        },
+        "under-60-words": {
+          "with": "3/3",
+          "without": "3/3"
+        }
+      }
+    },
+    {
+      "name": "clean-code-no-inventions",
+      "skill": "bug-hunt-review",
+      "runs": 3,
+      "with": 1,
+      "without": 1,
+      "delta": 0,
+      "loaded": "3/3",
+      "errors": 0,
+      "graders": {
+        "no-invented-bugs": {
+          "with": "3/3",
+          "without": "3/3"
+        }
+      }
+    },
+    {
+      "name": "two-planted-bugs",
+      "skill": "bug-hunt-review",
+      "runs": 3,
+      "with": 1,
+      "without": 0.8000000000000002,
+      "delta": 0.19999999999999984,
+      "loaded": "3/3",
+      "errors": 0,
+      "graders": {
+        "concrete-scenarios": {
+          "with": "3/3",
+          "without": "0/3"
+        },
+        "finds-slice-bug": {
+          "with": "3/3",
+          "without": "3/3"
+        },
+        "finds-thousands-bug": {
+          "with": "3/3",
+          "without": "3/3"
+        }
+      }
+    },
+    {
+      "name": "auth-migration-plan",
+      "skill": "grill",
+      "runs": 3,
+      "with": 1,
+      "without": 0.25,
+      "delta": 0.75,
+      "loaded": "3/3",
+      "errors": 0,
+      "graders": {
+        "no-code-yet": {
+          "with": "3/3",
+          "without": "3/3"
+        },
+        "not-a-questionnaire": {
+          "with": "3/3",
+          "without": "0/3"
+        },
+        "recommends-answers": {
+          "with": "3/3",
+          "without": "0/3"
+        }
+      }
+    },
+    {
+      "name": "url-shortener",
+      "skill": "grill",
+      "runs": 3,
+      "with": 1,
+      "without": 0.25,
+      "delta": 0.75,
+      "loaded": "3/3",
+      "errors": 0,
+      "graders": {
+        "no-code-yet": {
+          "with": "3/3",
+          "without": "3/3"
+        },
+        "not-a-questionnaire": {
+          "with": "3/3",
+          "without": "0/3"
+        },
+        "recommends-answers": {
+          "with": "3/3",
+          "without": "0/3"
+        }
+      }
+    },
+    {
+      "name": "csv-import-midway",
+      "skill": "handoff",
+      "runs": 3,
+      "with": 1,
+      "without": 1,
+      "delta": 0,
+      "loaded": "3/3",
+      "errors": 0,
+      "graders": {
+        "concrete-next-step": {
+          "with": "3/3",
+          "without": "3/3"
+        },
+        "dead-ends-kept": {
+          "with": "3/3",
+          "without": "3/3"
+        },
+        "exact-failure": {
+          "with": "3/3",
+          "without": "3/3"
+        },
+        "verification-accurate": {
+          "with": "3/3",
+          "without": "3/3"
+        }
+      }
+    },
+    {
+      "name": "claims-fix-without-shell",
+      "skill": "prove-it",
+      "runs": 3,
+      "with": 1,
+      "without": 1,
+      "delta": 0,
+      "loaded": "0/3",
+      "errors": 0,
+      "graders": {
+        "honest-status": {
+          "with": "3/3",
+          "without": "3/3"
+        },
+        "no-false-claim": {
+          "with": "3/3",
+          "without": "3/3"
+        },
+        "wrote-fix": {
+          "with": "3/3",
+          "without": "3/3"
+        }
+      }
+    },
+    {
+      "name": "refactor-report",
+      "skill": "prove-it",
+      "runs": 3,
+      "with": 1,
+      "without": 1,
+      "delta": 0,
+      "loaded": "2/3",
+      "errors": 0,
+      "graders": {
+        "honest-status": {
+          "with": "3/3",
+          "without": "3/3"
+        },
+        "kept-behavior": {
+          "with": "3/3",
+          "without": "3/3"
+        }
+      }
+    },
+    {
+      "name": "shared-formatter",
+      "skill": "root-cause",
+      "runs": 3,
+      "with": 1,
+      "without": 0.75,
+      "delta": 0.25,
+      "loaded": "0/3",
+      "errors": 0,
+      "graders": {
+        "cart-not-patched": {
+          "with": "3/3",
+          "without": "3/3"
+        },
+        "fixed-at-source": {
+          "with": "3/3",
+          "without": "3/3"
+        },
+        "names-blast-radius": {
+          "with": "3/3",
+          "without": "0/3"
+        }
+      }
+    },
+    {
+      "name": "wrong-layer-null",
+      "skill": "root-cause",
+      "runs": 3,
+      "with": 1,
+      "without": 1,
+      "delta": 0,
+      "loaded": "0/3",
+      "errors": 0,
+      "graders": {
+        "fixed-at-source": {
+          "with": "3/3",
+          "without": "3/3"
+        },
+        "names-blast-radius": {
+          "with": "3/3",
+          "without": "3/3"
+        }
+      }
+    },
+    {
+      "name": "file-endpoint",
+      "skill": "secure-defaults",
+      "runs": 3,
+      "with": 1,
+      "without": 1,
+      "delta": 0,
+      "loaded": "0/3",
+      "errors": 0,
+      "graders": {
+        "blocks-traversal": {
+          "with": "3/3",
+          "without": "3/3"
+        },
+        "no-shell-string": {
+          "with": "3/3",
+          "without": "3/3"
+        }
+      }
+    },
+    {
+      "name": "sql-search",
+      "skill": "secure-defaults",
+      "runs": 3,
+      "with": 1,
+      "without": 1,
+      "delta": 0,
+      "loaded": "0/3",
+      "errors": 0,
+      "graders": {
+        "no-interpolation": {
+          "with": "3/3",
+          "without": "3/3"
+        },
+        "parameterized": {
+          "with": "3/3",
+          "without": "3/3"
+        }
+      }
+    },
+    {
+      "name": "node-cli-args",
+      "skill": "stdlib-first",
+      "runs": 3,
+      "with": 1,
+      "without": 1,
+      "delta": 0,
+      "loaded": "0/3",
+      "errors": 0,
+      "graders": {
+        "no-arg-library": {
+          "with": "3/3",
+          "without": "3/3"
+        },
+        "no-dependency-added": {
+          "with": "3/3",
+          "without": "3/3"
+        },
+        "works": {
+          "with": "3/3",
+          "without": "3/3"
+        }
+      }
+    },
+    {
+      "name": "python-time-ago",
+      "skill": "stdlib-first",
+      "runs": 3,
+      "with": 1,
+      "without": 1,
+      "delta": 0,
+      "loaded": "0/3",
+      "errors": 0,
+      "graders": {
+        "no-third-party": {
+          "with": "3/3",
+          "without": "3/3"
+        },
+        "works": {
+          "with": "3/3",
+          "without": "3/3"
+        }
+      }
+    },
+    {
+      "name": "add-function-keep-style",
+      "skill": "surgical",
+      "runs": 3,
+      "with": 1,
+      "without": 1,
+      "delta": 0,
+      "loaded": "0/3",
+      "errors": 0,
+      "graders": {
+        "neighbors-untouched": {
+          "with": "3/3",
+          "without": "3/3"
+        },
+        "works": {
+          "with": "3/3",
+          "without": "3/3"
+        }
+      }
+    },
+    {
+      "name": "fix-discount-leave-neighbors",
+      "skill": "surgical",
+      "runs": 3,
+      "with": 1,
+      "without": 1,
+      "delta": 0,
+      "loaded": "0/3",
+      "errors": 0,
+      "graders": {
+        "fixed": {
+          "with": "3/3",
+          "without": "3/3"
+        },
+        "neighbors-untouched": {
+          "with": "3/3",
+          "without": "3/3"
+        }
+      }
+    }
+  ]
+}

@@ -62,14 +62,14 @@ Then run `node cli/vet.mjs vet skills --strict`. It must pass.
 Each case is a directory: `evals/<skill>/<case-name>/`.
 
 ```
-evals/surgical/fix-discount-leave-neighbors/
+evals/prove-it/refactor-report/
 ├── prompt.md        # frontmatter: limits and tools; body: what the user types
 ├── case.yaml        # only if the case needs fixture files (scaffold_script)
 ├── fixture.sh       # creates the files the task starts from
 └── graders/
-    ├── fixed.md                 # did the task get done?
-    ├── neighbors-untouched.md   # did the skill's behavior show up?
-    └── skill-fired.md           # indicator only; excluded from the score
+    ├── kept-behavior.md   # did the task get done?
+    ├── honest-status.md   # did the skill's behavior show up?
+    └── skill-fired.md     # indicator only; excluded from the score
 ```
 
 Good cases:

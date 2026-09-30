@@ -22,8 +22,8 @@ and they mostly get installed unread.
 
 This repo is two things:
 
-1. **[Skills](#the-skills)** rebuilt for current models, the popular ideas (verify before
-   claiming done, minimal diffs, root-cause debugging, bug-hunting review, handoffs) rewritten
+1. **[Skills](#the-skills)** rebuilt for current models, the popular ideas that survived testing (verify before
+   claiming done, root-cause debugging, bug-hunting review, grilling, handoffs) rewritten
    short and calm, each with an [eval suite](evals/) that measures what it adds over the model
    on its own.
 2. **[`vet`](#vet-check-any-skill-before-you-trust-it)**, a zero-dependency scanner that checks
@@ -62,18 +62,14 @@ name a GitHub repo.
 
 | Skill | What it changes | Fires when |
 | --- | --- | --- |
-| [`prove-it`](skills/prove-it/SKILL.md) | Separates what was checked from what was only written. No "fixed!" without the command and output that shows it. | Finishing any code change |
-| [`surgical`](skills/surgical/SKILL.md) | Smallest diff that solves the request. No drive-by refactors, reformatting, or renames; notices go in the reply instead. | Editing existing code |
-| [`root-cause`](skills/root-cause/SKILL.md) | Reproduce, trace the bad value back to its origin, fix it once there, and name the other callers it affected. | Debugging |
+| [`prove-it`](skills/prove-it/SKILL.md) | Separates what was checked from what was only written. No "fixed!" without the command and output that shows it. *Helps Haiku 4.5; Sonnet 5.5 already does it.* | Finishing any code change |
+| [`root-cause`](skills/root-cause/SKILL.md) | *On probation: mixed results (below).* Reproduce, trace the bad value back to its origin, fix it once there, and name the other callers it affected. | Debugging |
 | [`bug-hunt-review`](skills/bug-hunt-review/SKILL.md) | Reviews for defects with a concrete failing scenario each, ranked by severity. No padding with style nits. | Reviewing code or a PR |
-| [`stdlib-first`](skills/stdlib-first/SKILL.md) | Runtime built-ins and existing dependencies before new packages, with a note when it skipped one. | Code that could pull in a package |
 | [`grill`](skills/grill/SKILL.md) | Interviews you one decision at a time, each with a recommended answer, then writes a brief. | You ask to be grilled on a plan |
-| [`handoff`](skills/handoff/SKILL.md) | Writes `HANDOFF.md` a fresh session can resume from: state, verification status, dead ends, exact next step. | Ending or clearing a long session |
-| [`answer-first`](skills/answer-first/SKILL.md) | The first sentence is the answer. No preamble, no recap, no sign-off. | Direct questions and task reports |
-| [`secure-defaults`](skills/secure-defaults/SKILL.md) | *On probation.* Parameterized SQL, argument arrays, path containment, and so on. Current models may already do this. | Code touching untrusted input |
+| [`handoff`](skills/handoff/SKILL.md) | Writes `HANDOFF.md` a fresh session can resume from: state, verification status, dead ends, exact next step. *Helps Haiku 4.5; Sonnet 5.5 already does it.* | Ending or clearing a long session |
 
-All nine together add **≈685 tokens** to your agent's context (names and descriptions). A
-skill's body loads only when it fires, at 400–560 tokens each.
+All five together add **≈375 tokens** to your agent's context (names and descriptions). A
+skill's body loads only when it fires, at 460–560 tokens each.
 
 ## Results
 
@@ -84,21 +80,84 @@ contributes. Graders are deterministic regexes over files and replies where poss
 LLM judge with written PASS/FAIL rubrics where not.
 
 <!-- results:start -->
-> **First full run pending.** The suites are written and load cleanly; results for
-> `claude-sonnet-5-5` and `claude-opus-5-5` will be published here, including any skill that
-> fails to beat the baseline. To run them yourself:
->
-> ```bash
-> npm run evals   # needs Claude Code 2.1.269+, logged in; costs real usage
-> ```
+| Skill | Sonnet 5.5<br/>with → without (Δ) | Haiku 4.5<br/>with → without (Δ) | Skill loaded | Verdict |
+| --- | ---: | ---: | ---: | --- |
+| [`answer-first`](retired/skills/answer-first/SKILL.md) _(retired)_ | 80% → 80% (**0**) | 80% → 77% (**+3**) | 0/6 · 0/6 | ✂️ no measurable effect |
+| [`bug-hunt-review`](skills/bug-hunt-review/SKILL.md) | 100% → 90% (**+10**) | 87% → 70% (**+17**) | 6/6 · 6/6 | ✅ helps |
+| [`grill`](skills/grill/SKILL.md) | 100% → 25% (**+75**) | 83% → 25% (**+58**) | 6/6 · 6/6 | ✅ helps |
+| [`handoff`](skills/handoff/SKILL.md) | 100% → 100% (**0**) | 93% → 80% (**+13**) | 3/3 · 3/3 | ✅ helps on Haiku 4.5 |
+| [`prove-it`](skills/prove-it/SKILL.md) | 100% → 100% (**0**) | 53% → 42% (**+11**) | 2/6 · 3/6 | ✅ helps on Haiku 4.5 |
+| [`root-cause`](skills/root-cause/SKILL.md) | 100% → 88% (**+13**) | 38% → 49% (**-11**) | 0/6 · 0/6 | ✅ helps on Sonnet 5.5 |
+| [`secure-defaults`](retired/skills/secure-defaults/SKILL.md) _(retired)_ | 100% → 100% (**0**) | 58% → 67% (**-8**) | 0/6 · 0/6 | ❌ hurts on Haiku 4.5 |
+| [`stdlib-first`](retired/skills/stdlib-first/SKILL.md) _(retired)_ | 100% → 100% (**0**) | 92% → 92% (**0**) | 0/6 · 0/6 | ✂️ no measurable effect |
+| [`surgical`](retired/skills/surgical/SKILL.md) _(retired)_ | 100% → 100% (**0**) | 100% → 100% (**0**) | 0/6 · 0/6 | ✂️ no measurable effect |
+| _no skill should fire_ | 100% → 100% (**0**) | 100% → 100% (**0**) | – | ✅ nothing fired |
+
+**Sonnet 5.5**: 19 cases × 3 runs per arm, judge `claude-sonnet-5-5`, Claude Code 2.1.284, 2026-09-29, ≈$5.62 at list price<br/>
+**Haiku 4.5**: 19 cases × 3 runs per arm, judge `claude-sonnet-5-5`, Claude Code 2.1.284, 2026-09-29, ≈$5.28 at list price
+
+<details><summary>Per-case scores</summary>
+
+| Model | Skill | Case | With | Without | Δ | Loaded |
+| --- | --- | --- | ---: | ---: | ---: | ---: |
+| Sonnet 5.5 | _precision | `concept-question` | 100% | 100% | 0 | – |
+| Sonnet 5.5 | _precision | `translate` | 100% | 100% | 0 | – |
+| Sonnet 5.5 | answer-first | `fetch-vs-pull` | 60% | 60% | 0 | 0/3 |
+| Sonnet 5.5 | answer-first | `task-report` | 100% | 100% | 0 | 0/3 |
+| Sonnet 5.5 | bug-hunt-review | `clean-code-no-inventions` | 100% | 100% | 0 | 3/3 |
+| Sonnet 5.5 | bug-hunt-review | `two-planted-bugs` | 100% | 80% | +20 | 3/3 |
+| Sonnet 5.5 | grill | `auth-migration-plan` | 100% | 25% | +75 | 3/3 |
+| Sonnet 5.5 | grill | `url-shortener` | 100% | 25% | +75 | 3/3 |
+| Sonnet 5.5 | handoff | `csv-import-midway` | 100% | 100% | 0 | 3/3 |
+| Sonnet 5.5 | prove-it | `claims-fix-without-shell` | 100% | 100% | 0 | 0/3 |
+| Sonnet 5.5 | prove-it | `refactor-report` | 100% | 100% | 0 | 2/3 |
+| Sonnet 5.5 | root-cause | `shared-formatter` | 100% | 75% | +25 | 0/3 |
+| Sonnet 5.5 | root-cause | `wrong-layer-null` | 100% | 100% | 0 | 0/3 |
+| Sonnet 5.5 | secure-defaults | `file-endpoint` | 100% | 100% | 0 | 0/3 |
+| Sonnet 5.5 | secure-defaults | `sql-search` | 100% | 100% | 0 | 0/3 |
+| Sonnet 5.5 | stdlib-first | `node-cli-args` | 100% | 100% | 0 | 0/3 |
+| Sonnet 5.5 | stdlib-first | `python-time-ago` | 100% | 100% | 0 | 0/3 |
+| Sonnet 5.5 | surgical | `add-function-keep-style` | 100% | 100% | 0 | 0/3 |
+| Sonnet 5.5 | surgical | `fix-discount-leave-neighbors` | 100% | 100% | 0 | 0/3 |
+| Haiku 4.5 | _precision | `concept-question` | 100% | 100% | 0 | – |
+| Haiku 4.5 | _precision | `translate` | 100% | 100% | 0 | – |
+| Haiku 4.5 | answer-first | `fetch-vs-pull` | 60% | 53% | +7 | 0/3 |
+| Haiku 4.5 | answer-first | `task-report` | 100% | 100% | 0 | 0/3 |
+| Haiku 4.5 | bug-hunt-review | `clean-code-no-inventions` | 100% | 100% | 0 | 3/3 |
+| Haiku 4.5 | bug-hunt-review | `two-planted-bugs` | 73% | 40% | +33 | 3/3 |
+| Haiku 4.5 | grill | `auth-migration-plan` | 67% | 25% | +42 | 3/3 |
+| Haiku 4.5 | grill | `url-shortener` | 100% | 25% | +75 | 3/3 |
+| Haiku 4.5 | handoff | `csv-import-midway` | 93% | 80% | +13 | 3/3 |
+| Haiku 4.5 | prove-it | `claims-fix-without-shell` | 50% | 50% | 0 | 0/3 |
+| Haiku 4.5 | prove-it | `refactor-report` | 56% | 33% | +22 | 3/3 |
+| Haiku 4.5 | root-cause | `shared-formatter` | 75% | 75% | 0 | 0/3 |
+| Haiku 4.5 | root-cause | `wrong-layer-null` | 0% | 22% | -22 | 0/3 |
+| Haiku 4.5 | secure-defaults | `file-endpoint` | 67% | 83% | -17 | 0/3 |
+| Haiku 4.5 | secure-defaults | `sql-search` | 50% | 50% | 0 | 0/3 |
+| Haiku 4.5 | stdlib-first | `node-cli-args` | 100% | 100% | 0 | 0/3 |
+| Haiku 4.5 | stdlib-first | `python-time-ago` | 83% | 83% | 0 | 0/3 |
+| Haiku 4.5 | surgical | `add-function-keep-style` | 100% | 100% | 0 | 0/3 |
+| Haiku 4.5 | surgical | `fix-discount-leave-neighbors` | 100% | 100% | 0 | 0/3 |
+
+</details>
 <!-- results:end -->
 
 **The rule:** a skill stays only if its mean Δ is clearly positive on the current models. A
 skill with no measurable effect gets cut and listed below, because a skill that doesn't change
 behavior still costs context and attention on every turn.
 
-**Cut so far:** none yet. `secure-defaults` is on probation because current models may already
-parameterize SQL and avoid `shell=True` without being told.
+**Cut so far (4 of the original 9):** `surgical`, `stdlib-first`, `answer-first`, and
+`secure-defaults`. On both models they changed nothing measurable: the model without the skill
+already kept diffs small, used built-ins, parameterized SQL, and answered directly. None of them
+even loaded on natural prompts. They're kept in [`retired/`](retired/) with their evals, so anyone
+can re-test them on a future model or propose harder cases.
+
+**What we learned:** skills that add a *workflow the model wouldn't choose on its own* help most
+(`grill`: a recommended answer with every question; `bug-hunt-review`: a concrete failing scenario
+for every bug). "Be careful" skills that restate good habits don't help current models, and the
+smaller model benefits more (`handoff` and `prove-it` help Haiku 4.5 only). `root-cause` never
+loaded on either model, yet scored +13 on Sonnet and −11 on Haiku, so its effect comes from its
+description in the skill list alone and isn't reliable yet; it stays on probation.
 
 ## `vet`: check any skill before you trust it
 
@@ -148,7 +207,7 @@ checks the mechanical ones:
 
 - **Explain why, once.** A rule with its reason generalizes to cases the rule didn't list. The
   same rule in capitals, repeated, gets over-applied.
-- **Short.** 400–560 tokens per skill body. Nothing here needs `references/`.
+- **Short.** 460–560 tokens per skill body. Nothing here needs `references/`.
 - **The description is the trigger.** It says what the skill does, then when to use it, in the
   third person, under 1,024 characters.
 - **Portable.** Frontmatter stays within the open spec, except `argument-hint` on `grill`.

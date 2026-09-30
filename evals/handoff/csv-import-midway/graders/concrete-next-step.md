@@ -6,5 +6,5 @@ focus:
   path: 'HANDOFF.md'
 ---
 
-PASS if the first next step names a specific file or function to change (such as readRows or splitRow).
-FAIL if the next step is vague.
+PASS if the next steps are concrete enough to start on immediately: the first step names a specific command to run (such as re-running `npm test -- import`) or a specific file or function to change (such as readRows or splitRow).
+FAIL if the next steps are vague, like "continue fixing the parser" or "finish the CSV work".

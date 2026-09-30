@@ -8,12 +8,25 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- First eval results, on Sonnet 5.5 and Haiku 4.5 (19 cases × 3 runs per arm, with and without
+  the skills), in the README, with compact per-case evidence in `evals/published/`.
+- `scripts/results-table.mjs` merges result files per model, shows how often each skill loaded,
+  leaves out runs that errored (usage limits, expired logins), and saves evidence with `--save`.
 - `skill-vet rules` now prints a header row (`RULE`, `SEVERITY`, `DESCRIPTION`), and
   `skill-vet rules --format json` prints the rules as JSON objects with `id`, `severity`, and
   `description`, for use in tooling.
 
+### Removed
+
+- Retired four skills that showed no measurable benefit on either model: `surgical`,
+  `stdlib-first`, `answer-first`, and `secure-defaults`. They moved to `retired/` with their
+  evals, so the plugin no longer loads them. Current models already behave this way without them.
+
 ### Fixed
 
+- `handoff/csv-import-midway` grader `concrete-next-step` required the first next step to name a
+  function to change, which failed the correct answer "re-run the tests first". It now accepts a
+  specific command, file, or function. Found in the first Sonnet run (a spurious −13); re-run after the fix.
 - The README and two source comments still called the command `vetted`; they now say
   `skill-vet`. `--help` now lists the `-q` short form of `--quiet`. (Spotted by @Mevayaan1 in #35.)
 
