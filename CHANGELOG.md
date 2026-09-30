@@ -12,6 +12,11 @@ All notable changes to this project are documented here. The format follows
   `skill-vet rules --format json` prints the rules as JSON objects with `id`, `severity`, and
   `description`, for use in tooling.
 
+### Fixed
+
+- The README and two source comments still called the command `vetted`; they now say
+  `skill-vet`. `--help` now lists the `-q` short form of `--quiet`. (Spotted by @Mevayaan1 in #35.)
+
 ## [0.1.1] - 2026-09-29
 
 ### Added
