@@ -67,9 +67,25 @@ export function installedLocations(cwd = process.cwd()) {
     { agent: "Claude Code", scope: "user", path: join(h, ".claude", "skills") },
     { agent: "Claude Code", scope: "project", path: join(cwd, ".claude", "skills") },
     ...claudePluginPaths(h),
-    { agent: "Codex / shared .agents", scope: "user", path: join(h, ".agents", "skills") },
-    { agent: "Codex / shared .agents", scope: "project", path: join(cwd, ".agents", "skills") },
+    // Shared by Codex, Amp, and Zed: https://zed.dev/docs/ai/skills
+    { agent: "Shared .agents (Codex / Amp / Zed)", scope: "user", path: join(h, ".agents", "skills") },
+    { agent: "Shared .agents (Codex / Amp / Zed)", scope: "project", path: join(cwd, ".agents", "skills") },
     { agent: "Codex", scope: "user", path: join(h, ".codex", "skills") },
+    // https://docs.devin.ai/desktop/cascade/skills
+    { agent: "Windsurf / Cascade", scope: "user", path: join(h, ".codeium", "windsurf", "skills") },
+    { agent: "Windsurf / Cascade", scope: "user", path: join(h, ".config", "devin", "skills") },
+    { agent: "Windsurf / Cascade", scope: "project", path: join(cwd, ".devin", "skills") },
+    { agent: "Windsurf / Cascade", scope: "project", path: join(cwd, ".windsurf", "skills") },
+    // https://kiro.dev/docs/skills/
+    { agent: "Kiro", scope: "user", path: join(h, ".kiro", "skills") },
+    { agent: "Kiro", scope: "project", path: join(cwd, ".kiro", "skills") },
+    // https://github.com/cline/cline/blob/main/docs/customization/skills.mdx
+    { agent: "Cline", scope: "user", path: join(h, ".cline", "skills") },
+    { agent: "Cline", scope: "project", path: join(cwd, ".cline", "skills") },
+    { agent: "Cline", scope: "project", path: join(cwd, ".clinerules", "skills") },
+    // https://ampcode.com/docs/customize/skills
+    { agent: "Amp", scope: "user", path: join(h, ".config", "agents", "skills") },
+    { agent: "Amp", scope: "user", path: join(h, ".config", "amp", "skills") },
     { agent: "Cursor", scope: "user", path: join(h, ".cursor", "skills") },
     { agent: "Cursor", scope: "project", path: join(cwd, ".cursor", "skills") },
     { agent: "Gemini CLI", scope: "user", path: join(h, ".gemini", "skills") },
