@@ -12,6 +12,7 @@ All notable changes to this project are documented here. The format follows
   the skills), in the README, with compact per-case evidence in `evals/published/`.
 - `scripts/results-table.mjs` merges result files per model, shows how often each skill loaded,
   leaves out runs that errored (usage limits, expired logins), and saves evidence with `--save`.
+- `skill-vet vet --installed` discovers Windsurf/Cascade, Kiro, Cline, and Amp skill directories; shared `.agents/skills` already covers Zed.
 - `skill-vet rules` now prints a header row (`RULE`, `SEVERITY`, `DESCRIPTION`), and
   `skill-vet rules --format json` prints the rules as JSON objects with `id`, `severity`, and
   `description`, for use in tooling.
