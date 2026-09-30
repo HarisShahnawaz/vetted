@@ -72,6 +72,7 @@ const RULES = [
   ["sec/env-dump", "warn", "Dumps all environment variables"],
   ["sec/destructive", "warn", "Can wipe a home directory or disk"],
   ["sec/persistence", "warn", "Installs shell-profile, cron, launch-agent, or hook persistence"],
+  ["sec/sudo", "warn", "Uses sudo to escalate privileges"],
   ["sec/hidden-instructions", "warn", "Instructions inside HTML comments"],
   ["sec/broad-allowed-tools", "warn", "Pre-approves an unrestricted shell"],
   ["sec/binary", "warn", "Ships compiled executables"],

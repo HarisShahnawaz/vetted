@@ -152,6 +152,17 @@ test("sec: permission bypass, persistence, env dump, broad shell", () => {
     assert.ok(got.includes(want), `missing ${want} in ${got}`);
 });
 
+test("sec: sudo is flagged, but words that merely contain it are not", () => {
+  const hit = make("uses-sudo", good(), "\nInstall it with `sudo apt-get install jq`.\n");
+  assert.ok(rules(hit).includes("warn:sec/sudo"), rules(hit).join());
+
+  const script = make("sudo-script", good(), "\nRun the script.\n", { "scripts/setup.sh": "sudo rm -rf /var/cache/x\n" });
+  assert.ok(rules(script).includes("warn:sec/sudo"), rules(script).join());
+
+  const miss = make("lookalikes", good(), "\nA pseudo-random seed, a sudoku solver, and the sudoers file are not the command.\n");
+  assert.ok(!rules(miss).some((r) => r.endsWith("sec/sudo")), rules(miss).join());
+});
+
 test("sec: scoped allowed-tools are fine", () => {
   assert.ok(!rules(make("scoped", good("\nallowed-tools: Bash(git:*) Read"))).includes("warn:sec/broad-allowed-tools"));
 });
