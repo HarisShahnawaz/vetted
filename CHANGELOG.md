@@ -6,6 +6,8 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.1.2] - 2026-10-01
+
 ### Added
 
 - First eval results, on Sonnet 5.5 and Haiku 4.5 (19 cases × 3 runs per arm, with and without
@@ -13,9 +15,6 @@ All notable changes to this project are documented here. The format follows
 - `scripts/results-table.mjs` merges result files per model, shows how often each skill loaded,
   leaves out runs that errored (usage limits, expired logins), and saves evidence with `--save`.
 - `skill-vet vet --installed` discovers Windsurf/Cascade, Kiro, Cline, and Amp skill directories; shared `.agents/skills` already covers Zed.
-- `skill-vet rules` now prints a header row (`RULE`, `SEVERITY`, `DESCRIPTION`), and
-  `skill-vet rules --format json` prints the rules as JSON objects with `id`, `severity`, and
-  `description`, for use in tooling.
 - `vet` rule `sec/sudo` (warn): flags `sudo` in skill bodies and scripts, since a skill that
   escalates privileges deserves a second look. Words that only contain it (`pseudo`, `sudoku`,
   `sudoers`) are not flagged.
@@ -31,13 +30,14 @@ All notable changes to this project are documented here. The format follows
 - `handoff/csv-import-midway` grader `concrete-next-step` required the first next step to name a
   function to change, which failed the correct answer "re-run the tests first". It now accepts a
   specific command, file, or function. Found in the first Sonnet run (a spurious −13); re-run after the fix.
-- The README and two source comments still called the command `vetted`; they now say
-  `skill-vet`. `--help` now lists the `-q` short form of `--quiet`. (Spotted by @Mevayaan1 in #35.)
 
-## [0.1.1] - 2026-09-29
+## [0.1.1] - 2026-09-30
 
 ### Added
 
+- `skill-vet rules` now prints a header row (`RULE`, `SEVERITY`, `DESCRIPTION`), and
+  `skill-vet rules --format json` prints the rules as JSON objects with `id`, `severity`, and
+  `description`, for use in tooling.
 - `vet` flag `--quiet` (`-q`): prints only findings, with no summary line or cost
   table, for cleaner use in scripts and CI logs.
 - `vet` rule `sec/suspicious-install` (warn): flags `npm install`, `pip install`, and `cargo add`
@@ -53,6 +53,8 @@ All notable changes to this project are documented here. The format follows
 
 ### Fixed
 
+- The README and two source comments still called the command `vetted`; they now say
+  `skill-vet`. `--help` now lists the `-q` short form of `--quiet`. (Spotted by @Mevayaan1 in #35.)
 - `sec/suspicious-install` no longer reads past the closing backtick of inline code, which flagged
   `pytest` as a typosquat of itself in lists like `` `npm test`, `pytest` ``.
 - Fenced code blocks indented under a list item are now treated as code, so example links inside
