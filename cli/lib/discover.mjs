@@ -27,8 +27,10 @@ export function findSkillFiles(root, depth = 0, out = []) {
   } catch {
     return out;
   }
-  for (const e of entries) {
-    if (e.isFile() && e.name === "SKILL.md") out.push(resolve(join(root, e.name)));
+  const skillFile = entries.find((e) => e.isFile() && e.name === "SKILL.md");
+  if (skillFile) {
+    out.push(resolve(join(root, skillFile.name)));
+    return out;
   }
   for (const e of entries) {
     if (e.isDirectory() && !SKIP.has(e.name)) findSkillFiles(join(root, e.name), depth + 1, out);

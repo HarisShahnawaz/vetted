@@ -6,6 +6,11 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Fixed
+
+- The vet command keeps nested SKILL.md resources inside their parent skill while continuing to
+  scan them for security findings.
+
 ## [0.1.2] - 2026-10-01
 
 ### Added
