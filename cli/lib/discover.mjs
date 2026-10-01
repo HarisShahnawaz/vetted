@@ -9,7 +9,16 @@ import { execFileSync } from "node:child_process";
 const SKIP = new Set([".git", "node_modules", "__pycache__", ".venv", "venv", "dist", "build", "target", ".next", ".cache"]);
 const MAX_DEPTH = 10;
 
-export function findSkillFiles(root, depth = 0, out = []) {
+// A SKILL.md that opens with a frontmatter block declares a skill of its own.
+function hasFrontmatter(file) {
+  try {
+    return readFileSync(file, "utf8").replace(/^﻿/, "").split(/\r?\n/, 1)[0].trim() === "---";
+  } catch {
+    return false;
+  }
+}
+
+export function findSkillFiles(root, depth = 0, out = [], insideSkill = false) {
   let st;
   try {
     st = statSync(root);
@@ -27,11 +36,14 @@ export function findSkillFiles(root, depth = 0, out = []) {
   } catch {
     return out;
   }
+  // Inside a skill, a SKILL.md without frontmatter is one of the parent's
+  // files (scanned with the parent). One with frontmatter is a sub-skill and
+  // gets its own spec checks.
+  const skillFile = entries.find((e) => e.isFile() && e.name === "SKILL.md");
+  const path = skillFile && resolve(join(root, skillFile.name));
+  if (path && (!insideSkill || hasFrontmatter(path))) out.push(path);
   for (const e of entries) {
-    if (e.isFile() && e.name === "SKILL.md") out.push(resolve(join(root, e.name)));
-  }
-  for (const e of entries) {
-    if (e.isDirectory() && !SKIP.has(e.name)) findSkillFiles(join(root, e.name), depth + 1, out);
+    if (e.isDirectory() && !SKIP.has(e.name)) findSkillFiles(join(root, e.name), depth + 1, out, insideSkill || !!skillFile);
   }
   return out;
 }
