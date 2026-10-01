@@ -36,3 +36,13 @@ test("nested SKILL.md files stay part of their parent skill and remain security 
     ),
   );
 });
+
+test("a nested SKILL.md with its own frontmatter is a separate sub-skill", () => {
+  box.skill("sub-skill/parent", "name: parent\ndescription: " + GOOD_DESC, undefined, {
+    "child/SKILL.md": "---\nname: child\ndescription: " + GOOD_DESC + "\n---\n\nDo the child task.\n",
+    "notes/SKILL.md": "Plain notes with no frontmatter.\n",
+  });
+
+  const found = findSkillFiles(join(box.root, "sub-skill")).map((f) => f.split(/[\\/]/).slice(-2).join("/"));
+  assert.deepEqual(found.sort(), ["child/SKILL.md", "parent/SKILL.md"]);
+});

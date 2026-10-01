@@ -9,7 +9,8 @@ All notable changes to this project are documented here. The format follows
 ### Fixed
 
 - The vet command keeps nested SKILL.md resources inside their parent skill while continuing to
-  scan them for security findings.
+  scan them for security findings. A nested SKILL.md that has its own frontmatter is still checked
+  as a sub-skill.
 
 ## [0.1.2] - 2026-10-01
 
