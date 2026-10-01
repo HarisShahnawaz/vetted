@@ -80,3 +80,6 @@ All notable changes to this project are documented here. The format follows
   scanning of local paths, GitHub repos, and installed skills.
 - GitHub Action (`uses: nadirali1350/vetted@v0`).
 - Claude Code plugin and marketplace, plus Codex and Cursor plugin manifests.
+## [Unreleased]
+
+- Add Urdu translation of the README.
