@@ -50,6 +50,8 @@ npx @menadirali/skill-vet vet --installed           # everything your agents hav
 
 Node 18+ کافی ہے، اور کچھ نہیں چاہیے۔ کوئی install نہیں، کوئی account نہیں، network صرف اس وقت استعمال ہوتا ہے جب آپ GitHub repo کا نام دیں۔
 
+<a id="the-skills"></a>
+
 ## Skills
 
 | Skill | کیا بدلتا ہے | کب چلتا ہے |
@@ -136,6 +138,8 @@ Node 18+ کافی ہے، اور کچھ نہیں چاہیے۔ کوئی install ن
 
 **ہم نے کیا سیکھا:** وہ skills سب سے زیادہ مددگار ہوتی ہیں جو ایسا *workflow* دیتی ہیں جو model خود نہیں اپناتا
 (`grill`: ہر سوال کے ساتھ ایک تجویز کردہ جواب؛ `bug-hunt-review`: ہر bug کے لیے ایک ٹھوس ناکام scenario)۔ "محتاط رہو" قسم کی skills جو اچھی عادتیں دہراتی ہیں، موجودہ models کی مدد نہیں کرتیں، اور چھوٹا model زیادہ فائدہ اٹھاتا ہے (`handoff` اور `prove-it` صرف Haiku 4.5 کے لیے مددگار ہیں)۔ `root-cause` کسی بھی model پر load نہیں ہوئی، پھر بھی Sonnet پر +13 اور Haiku پر −11 رہی — یعنی اس کا اثر skill list میں موجود اس کی تفصیل سے ہے، اور یہ ابھی قابلِ اعتماد نہیں؛ اس لیے یہ زیر نگرانی ہے۔
+
+<a id="vet-check-any-skill-before-you-trust-it"></a>
 
 ## `vet`: کوئی بھی skill پر بھروسہ کرنے سے پہلے جانچیں
 
